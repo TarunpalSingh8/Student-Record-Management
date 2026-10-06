@@ -40,3 +40,52 @@ Student-Record-Management/
 ├── student_management.py
 ├── README.md
 └── students.json
+classDiagram
+    class Account {
+        <<abstract>>
+        +account_no
+        +holder
+        -__balance
+        +balance* (read-only)
+        +deposit(amount)
+        +withdraw(amount)
+        +get_history() list
+        +available_to_withdraw()* float
+        +account_type* str
+    }
+    class SavingsAccount {
+        +MIN_BALANCE = 500
+        +INTEREST_RATE = 0.04
+        +available_to_withdraw() float
+        +apply_interest()
+    }
+    class CurrentAccount {
+        +OVERDRAFT_LIMIT = 5000
+        +available_to_withdraw() float
+    }
+    class Transaction {
+        <<dataclass, frozen>>
+        +kind
+        +amount
+        +balance_after
+        +timestamp
+    }
+    class Bank {
+        +name
+        -_accounts : dict
+        +create_account(holder, kind, opening_balance) Account
+        +get_account(account_no) Account
+        +transfer(from_no, to_no, amount)
+        +all_accounts() list
+    }
+    class BankError {
+        <<exception>>
+    }
+    BankError <|-- InvalidAmountError
+    BankError <|-- InsufficientFundsError
+    BankError <|-- AccountNotFoundError
+
+    Account <|-- SavingsAccount
+    Account <|-- CurrentAccount
+    Account "1" o-- "*" Transaction : records
+    Bank "1" o-- "*" Account : manages
